@@ -12,7 +12,11 @@ import android.widget.TextView;
 import com.osm.attendance.R;
 import com.osm.attendance.model.Authentication;
 import com.osm.attendance.model.AuthenticationData;
+import com.osm.attendance.model.Timetable;
+import com.osm.attendance.services.GETHoursDay;
 import com.osm.attendance.services.POSTAuthenticate;
+
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -59,8 +63,19 @@ public class LoginActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     AuthenticationData authenticationData = response.body();
                     if (authenticationData.result != null){
-                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                        startActivity(intent);
+                        String sessionId = response
+                                .headers()
+                                .values("Set-Cookie")
+                                .get(0)
+                                .split(";")[0]
+                                .split("=")[1];
+                        GETHoursDay service = retrofit.create(GETHoursDay.class);
+                        Call<List<Timetable>> repository = service
+                                .getHours(
+                                "session_id=" + sessionId + ";"
+                                , authenticationData.result.uid,
+                                0);
+                        getHours(repository, sessionId, authenticationData, info);
                     }
                     else {
                         info.setText("username/password incorrect");
@@ -74,6 +89,45 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<AuthenticationData> call, Throwable t) {
                 info.setText("Authentication error try later");
+            }
+        });
+    }
+
+    private void getHours(Call<List<Timetable>> repository, String sessionId, AuthenticationData authenticationData, TextView info) {
+
+        repository.enqueue(new Callback<List<Timetable>>() {
+            @Override
+            public void onResponse(Call<List<Timetable>> call, Response<List<Timetable>> response) {
+                if (response.isSuccessful()){
+
+                    List<Timetable> times = response.body();
+                    if (times != null){
+                        String hours = "";
+                        for (Timetable t: times){
+                            hours += t.hour_from + "-" + t.hour_to + " y de ";
+
+                        }
+                        hours += ".";
+                        hours = hours.replace(" y de .", "");
+                        Intent intent = new Intent(
+                                LoginActivity.this, MainActivity.class);
+                        intent.putExtra("session_id", sessionId);
+                        intent.putExtra("uid", authenticationData.result.uid);
+                        intent.putExtra("hours", hours);
+                        startActivity(intent);
+                    }
+                    else {
+                        info.setText("Error getting schedule");
+                    }
+                }
+                else {
+                    info.setText("It has not been possible to obtain the schedule");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Timetable>> call, Throwable t) {
+                info.setText("It has not been possible to obtain the schedule");
             }
         });
     }
