@@ -3,4 +3,9 @@
     <string name="username">Usuario</string>
     <string name="password">Contraseña</string>
     <string name="login">Iniciar sesión</string>
+    <string name="logout">Cerrar sesión</string>
+    <string name="your_timetable">Tu horario de hoy es de:</string>
+    <string name="begin">Hora de entrada</string>
+    <string name="finish">Hora de salida</string>
+    <string name="validate">Validar marcajes</string>
 </resources>

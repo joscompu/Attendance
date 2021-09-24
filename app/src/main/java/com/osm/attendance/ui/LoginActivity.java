@@ -36,13 +36,13 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl("http://localhost:8069/")
+                        .baseUrl("http://192.168.100.12:8069/")
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
                 POSTAuthenticate service = retrofit.create(POSTAuthenticate.class);
                 Authentication authentication = new
                         Authentication("2.0", new
-                        Authentication.Params("odoo_android",
+                        Authentication.Params("odoo_osm",
                         username.getText().toString(),
                         password.getText().toString()));
                 Call<AuthenticationData> repository = service.authenticate(authentication);
