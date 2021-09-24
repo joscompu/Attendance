@@ -15,6 +15,7 @@ import com.osm.attendance.model.AuthenticationData;
 import com.osm.attendance.model.Timetable;
 import com.osm.attendance.services.GETHoursDay;
 import com.osm.attendance.services.POSTAuthenticate;
+import com.osm.attendance.util.Time;
 
 import java.util.List;
 
@@ -74,7 +75,7 @@ public class LoginActivity extends AppCompatActivity {
                                 .getHours(
                                 "session_id=" + sessionId + ";"
                                 , authenticationData.result.uid,
-                                0);
+                                        Time.getCurrentDayNUmber());
                         getHours(repository, sessionId, authenticationData, info);
                     }
                     else {
